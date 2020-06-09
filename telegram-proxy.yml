@@ -1,0 +1,58 @@
+version: '3.8'
+
+networks:
+    telegram-proxy:
+        driver: overlay
+        external: false
+    net:
+        driver: overlay
+        attachable: true
+
+volumes:
+    telegram-proxy: {}
+
+services:
+    telegram-proxy:
+        image: telegrammessenger/proxy:latest
+        environment:
+            - TAG=37d53d2b1e5254ce56f98216d6631fd9
+            - SECRET=bb4a9de3040a23e601b509d0b4acaeed
+            - WORKERS=16
+        volumes:
+            - /mnt/telegram-proxy:/data
+        deploy:
+            mode: replicated
+#            replicas: 3
+#            placement:
+#                constraints:
+#                    - node.role == worker
+            resources:
+                limits:
+                    cpus: '0.40'
+                    memory: 100M
+                reservations:
+                    cpus: '0.25'
+                    memory: 50M
+            update_config:
+                parallelism: 1
+                delay: 15s
+                monitor: 10s
+                max_failure_ratio: 1
+                order: stop-first
+            rollback_config:
+                parallelism: 1
+                delay: 15s
+                monitor: 10s
+                max_failure_ratio: 1
+                order: stop-first
+            restart_policy:
+                condition: on-failure
+                delay: 30s
+                max_attempts: 3
+                window: 120s
+        networks:
+            - default
+            - telegram-proxy
+            - net
+        ports:
+            - 4444:443/tcp
