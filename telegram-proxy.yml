@@ -1,0 +1,21 @@
+version: '3.8'
+
+volumes:
+    telegram-proxy: {}
+
+services:
+    telegram-proxy:
+        container_name: telegram-proxy
+        image: telegrammessenger/proxy:latest
+        environment:
+#Your promote tag
+#            - TAG=
+#Secret code for connecting to the Telegram proxy
+#            - SECRET=
+            - WORKERS=16
+        volumes:
+            - telegram-proxy:/data
+        networks:
+            - default
+        ports:
+            - 443:443/tcp
