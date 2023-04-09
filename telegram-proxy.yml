@@ -1,21 +1,30 @@
 version: '3.8'
 
+networks:
+    telegram-proxy:
+        driver: overlay
+        external: false
+    net:
+        driver: overlay
+        attachable: true
+
 volumes:
     telegram-proxy: {}
 
 services:
     telegram-proxy:
-        container_name: telegram-proxy
         image: telegrammessenger/proxy:latest
         environment:
-#Your promote tag
-#            - TAG=
-#Secret code for connecting to the Telegram proxy
-#            - SECRET=
+            - TAG=
+            - SECRET=
             - WORKERS=16
         volumes:
             - telegram-proxy:/data
+        deploy:
+            mode: replicated
+            replicas: 1
         networks:
-            - default
+            - telegram-proxy
+            - net
         ports:
-            - 443:443/tcp
+            - 4444:443/tcp
